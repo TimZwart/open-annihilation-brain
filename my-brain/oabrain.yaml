@@ -1,0 +1,39 @@
+# The brain's manifest. Strict YAML: one document, no anchors, no block scalars.
+# Full key list: docs/brains/oabrain-standard.md, section 3.
+
+oabrain: 1
+# TODO: pick your own id. Lower-case kebab-case; it becomes the folder name under Brains/.
+id: my-brain
+name: My Brain
+version: "0.1.0"
+author:
+  name: "TODO: your name"
+description: "A starter brain: builds an economy, one factory, and attacks in waves.\nScaffolded from the OABrain standard."
+tags:
+  - economy
+  - experimental
+works-with:
+  - "*"
+levels:
+  - id: easy
+    name: Easy
+    difficulty: easy
+  - id: medium
+    name: Medium
+    difficulty: medium
+  - id: hard
+    name: Hard
+    difficulty: hard
+fullAwareness: false
+options:
+  wave:
+    type: choice
+    label: "Attack wave size"
+    values: ["small", "medium", "large"]
+    default: "medium"
+    labels: ["Small (4)", "Medium (8)", "Large (12)"]
+  verbose:
+    type: toggle
+    label: "Write debug lines to the seat log"
+    default: false
+entry: brain.lua
