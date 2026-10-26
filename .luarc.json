@@ -10,5 +10,5 @@
     "coroutine": "disable"
   },
   "workspace.library": ["types"],
-  "workspace.ignoreDir": ["dist", "tools", "test"]
+  "workspace.ignoreDir": ["dist", "tools"]
 }

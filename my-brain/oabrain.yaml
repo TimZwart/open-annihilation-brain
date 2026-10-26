@@ -8,10 +8,11 @@ name: My Brain
 version: "0.1.0"
 author:
   name: "TODO: your name"
-description: "A starter brain: builds an economy, one factory, and attacks in waves.\nScaffolded from the OABrain standard."
+description: "TODO: what this brain does."
+# 1 to 4 of: classic, economy, rush, turtle, air, naval, learned, teaching, experimental
 tags:
-  - economy
   - experimental
+# "*" is any mod and the base game; "ta-3.1c" is the base game alone.
 works-with:
   - "*"
 levels:
@@ -24,16 +25,12 @@ levels:
   - id: hard
     name: Hard
     difficulty: hard
+# true lets the brain see every unit, as TA's own computer player does.
 fullAwareness: false
-options:
-  wave:
-    type: choice
-    label: "Attack wave size"
-    values: ["small", "medium", "large"]
-    default: "medium"
-    labels: ["Small (4)", "Medium (8)", "Large (12)"]
-  verbose:
-    type: toggle
-    label: "Write debug lines to the seat log"
-    default: false
+# Options the player can set; read them as me.options.<id>. For example:
+# options:
+#   aggressive:
+#     type: toggle
+#     label: "Attack early"
+#     default: false
 entry: brain.lua
