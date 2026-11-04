@@ -26,6 +26,8 @@ local metal_spots = nil
 
 local decisionalreadyplannedforcommander = false
 
+local targetPlayerComposition = {lighttanks=0, anti_swarm=0, mediumtanks=0}
+
 local function debugPrint(text)
     brain.say(text)
     print(text)
@@ -169,6 +171,14 @@ local function buildTank(vehicle_plant)
     buildThingWithVehiclePlant(vehicle_plant,"ARMFLASH", "CORGATOR") 
 end
 
+local function buildAntiSwarm(vehicle_plant)
+    buildThingWithVehiclePlant(vehicle_plant,"ARMFLASH", "CORLEVLR") 
+end
+
+local function buildMediumTank(vehicle_plant)
+    buildThingWithVehiclePlant(vehicle_plant,"ARMSTUMP", "CORRAID") 
+end
+
 local function step()
     if firstStep then
         debugPrint("Hello world!")
@@ -195,7 +205,7 @@ end
 
 local function onComIdleAndEnergyBalanceUpdated()
     if not commander.alive then
-        return -- we don't want to build anything before the first step has run, because we need to know the target player info and metal spots
+        return 
     end
     decisionalreadyplannedforcommander = false
     local energydifference = me.energy_produced:tonumber() - me.energy_requested:tonumber() -- on easy the amount of energy produced is two times lower, for example so we need to ask the game for it.
@@ -229,7 +239,13 @@ local function onVehiclePlantIdleAndEnergyBalanceUpdated(vehicle_plant)
     local energydifference = me.energy_produced:tonumber() - me.energy_requested:tonumber() -- on easy the amount of energy produced is two times lower, for example so we need to ask the game for it.
     local metaldifference = me.metal_produced:tonumber() - me.metal_requested:tonumber()
     if metaldifference > 5 and energydifference > 10 then
-        buildTank(vehicle_plant)
+        if targetPlayerComposition.lighttanks > targetPlayerComposition.anti_swarm and targetPlayerComposition.lighttanks > targetPlayerComposition.mediumtanks then
+            buildAntiSwarm(vehicle_plant)
+        elseif targetPlayerComposition.mediumtanks > targetPlayerComposition.lighttanks and targetPlayerComposition.mediumtanks > targetPlayerComposition.anti_swarm then
+            buildTank(vehicle_plant)
+        else
+            buildMediumTank(vehicle_plant)
+        end
     else
         debugPrint("not building tank bc energydifference is " .. energydifference .. " and metaldifference is " .. metaldifference)
         brain.after(300, function() onVehiclePlantIdleAndEnergyBalanceUpdated(vehicle_plant) end) -- wait a second to see if the energy balance changes before we build something
@@ -280,13 +296,13 @@ function hooks.onUnitFinished(unit, builder)
     if builder.type.unitname == "ARMVP" or builder.type.unitname == "CORVP" then
         brain.after(60, function() onVehiclePlantIdleAndEnergyBalanceUpdated(builder) end) -- wait a second to see if the energy balance changes before we build something
     end
-    if unit.type.unitname == "ARMFLASH" or unit.type.unitname == "CORGATOR" then
+    if unit.type.unitname == "ARMFLASH" or unit.type.unitname == "CORGATOR" or unit.type.unitname == "ARMSTUMP" or unit.type.unitname == "CORRAID" or unit.type.unitname == "CORLEVLR" then
         tanks = tanks + 1
         if tanks > 10 * wavefactor then
             wavefactor = wavefactor * 1.3
             -- attack with tanks
             for _, tank in ipairs(me:units()) do
-                if (tank.type.unitname == "ARMFLASH" or tank.type.unitname == "CORGATOR") and tank.finished then
+                if (tank.type.unitname == "ARMFLASH" or tank.type.unitname == "CORGATOR" or tank.type.unitname == "ARMSTUMP" or tank.type.unitname == "CORRAID" or tank.type.unitname == "CORLEVLR") and tank.finished then
                     local targetx = nil
                     local targetz = nil
                     if targetPlayerInfo.start_x == nil then -- this can be made more intelligent, this is if there are random start positions
@@ -364,6 +380,15 @@ end
 -- Sight and radar ---------------------------------------------------------
 
 function hooks.onUnitSeen(unit)
+    if unit.owner == targetPlayerInfo.player then
+        if unit.type.unitname == "ARMFLASH" or unit.type.unitname == "CORGATOR" then
+            targetPlayerComposition.lighttanks = targetPlayerComposition.lighttanks + 1
+        elseif unit.type.unitname == "ARMWARRIOR" or unit.type.unitname == "CORLEVLR" then
+            targetPlayerComposition.anti_swarm = targetPlayerComposition.anti_swarm + 1
+        elseif unit.type.unitname == "ARMSTUMPY" or unit.type.unitname == "CORRAID" then
+            targetPlayerComposition.mediumtanks = targetPlayerComposition.mediumtanks + 1
+        end
+    end
 end
 
 function hooks.onUnitLost(unit)
