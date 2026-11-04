@@ -49,5 +49,13 @@ This writes `dist\<id>-<version>.oabrain`.
 
 This copies the folder to `Documents\Open Annihilation\Brains\<id>`.
 
+```powershell
+.\tools\play.ps1 [-Map Fullmoon] [-Side arm] [-BrainSide core] [-Level hard]
+```
+
+This checks and installs the brain, then opens a hosted game room with you
+against it. Press START. In VS Code it is the default build task
+(Ctrl+Shift+B), which saves your files first.
+
 **Note:** Open Annihilation 0.8.5's `oa-tool` has no `brain` command yet.
 `check.ps1` and `pack.ps1` stop with a message until you update the game.

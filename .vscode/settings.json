@@ -1,0 +1,4 @@
+{
+    // Save every changed file before a task runs, so the game gets what is on screen.
+    "task.saveBeforeRun": "always"
+}
